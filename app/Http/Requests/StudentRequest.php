@@ -28,6 +28,7 @@ class StudentRequest extends FormRequest
             'password'    => 'required|string|min:6',
             'phone'       => 'nullable|string',
             'national_id' => 'required|unique:users,national_id',
+            'academic_id' => 'required|interger',
             'birth_date'  => 'nullable|date',
             'address'     => 'nullable|string',
             'image'       => 'nullable|image|max:5096',

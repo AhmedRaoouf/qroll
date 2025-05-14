@@ -18,13 +18,15 @@ class AuthController extends Controller
         //Admin
         if ($data['role_id'] == 1) {
             $user = User::where('email', $request->email)
-            ->where('role_id', $request->role_id)
-            ->first();
+                ->where('role_id', $request->role_id)
+                ->first();
+        } else {
+            //Other Roles
+            $user = User::where('national_id', $request->email)
+                ->where('role_id', $request->role_id)
+                ->first();
         }
-        //Other Roles
-        $user = User::where('national_id', $request->email)
-                    ->where('role_id', $request->role_id)
-                    ->first();
+
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
@@ -44,23 +46,22 @@ class AuthController extends Controller
         return response()->json(['message' => 'Logged out']);
     }
 
-    public function ChangePassword (Request $request)
+    public function ChangePassword(Request $request)
     {
         $user = auth()->user();
-        $user->password = Hash::make($request-> password);
+        $user->password = Hash::make($request->password);
         $user->save();
-        return response()-> json(['message' => 'Password changed successfully']);
+        return response()->json(['message' => 'Password changed successfully']);
     }
 
-    public function resetPassword (Request $request)
+    public function resetPassword(Request $request)
     {
         $user = auth()->user();
         if (!$user || !Hash::check($request->old_password, $user->password)) {
             return response()->json(['message' => 'Old password not correct!'], 401);
         }
-        $user->password = Hash::make($request-> new_password);
-        $user-> save();
-        return response()-> json(['message' => 'Password changed successfully']);
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+        return response()->json(['message' => 'Password changed successfully']);
     }
 }
-
