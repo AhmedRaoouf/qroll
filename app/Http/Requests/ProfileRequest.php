@@ -25,11 +25,11 @@ class ProfileRequest extends FormRequest
         return [
             'name'        => 'required|string|max:255',
             'email'       => 'required|email|unique:users,email,' . $this->user()->id,
-            'phone'       => 'nullable|string|max:15',
+            'phone'       => 'somtimes|string|max:15',
             'national_id' => 'required|string|unique:users,national_id,' . $this->user()->id,
-            'birth_date'  => 'nullable|date',
-            'address'     => 'nullable|string|max:255',
-            'image'     => 'nullable|image|max:5096',
+            'birth_date'  => 'somtimes|date',
+            'address'     => 'somtimes|string|max:255',
+            'image'     => 'somtimes|image|max:5096',
         ];
     }
 }

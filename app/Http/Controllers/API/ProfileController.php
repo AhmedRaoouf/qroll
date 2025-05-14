@@ -31,7 +31,15 @@ class ProfileController extends Controller
             $data['image'] = $image;
         }
 
-        $user->update($data);
+        $user->update([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'address' => $data['address'],
+            'birth_date' => $data['birth_date'],
+            'national_id' => $data['national_id'],
+            'image' => $data['image'],
+        ]);
         return response()->json([
             'data' => new UserResource($user)
         ]);

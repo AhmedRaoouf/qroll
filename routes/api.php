@@ -14,7 +14,7 @@ Route::middleware('guest')->group(function () {
 });
 
 // 🔐 Authenticated Routes
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('api-auth')->group(function () {
     Route::get('/profile',[ProfileController::class,'index']);
     Route::post('/profile/update',[ProfileController::class,'update']);
     Route::post('/logout', [AuthController::class, 'logout']);
