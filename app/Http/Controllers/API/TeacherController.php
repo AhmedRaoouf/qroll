@@ -25,7 +25,7 @@ class TeacherController extends Controller
 
     public function store(TeacherRequest $request)
     {
-        $role = Role::where('name', 'Teacher')->first();
+        $role = Role::where('name', 'teacher')->first();
         if (!$role) {
             return response()->json(['message' => 'Teacher role not found'], 422);
         }

@@ -27,7 +27,7 @@ class ApiAuthenticate
                 'message' => 'Unauthorized: Invalid token',
             ], 401);
         }
-
+        
         return $next($request);
     }
 }
