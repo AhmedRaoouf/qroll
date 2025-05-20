@@ -19,4 +19,19 @@ class Course extends BaseModel
     {
         return $this->belongsTo(Teacher::class);
     }
+
+    public function sections()
+    {
+        return $this->hasMany(Section::class);
+    }
+
+    public function lectures()
+    {
+        return $this->hasMany(Lecture::class);
+    }
+
+    public function students()
+    {
+        return $this->belongsToMany(Student::class, 'student_courses', 'course_id', 'student_id');
+    }
 }

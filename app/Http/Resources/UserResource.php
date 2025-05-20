@@ -22,6 +22,7 @@ class UserResource extends JsonResource
             'national_id' => $this->national_id,
             'birth_date'  => $this->birth_date,
             'address'     => $this->address,
+            'image'       => asset($this->image),
             'role'        => $this->role?->name,
             'created_at'  => $this->created_at?->toDateTimeString(),
             'updated_at'  => $this->updated_at?->toDateTimeString(),

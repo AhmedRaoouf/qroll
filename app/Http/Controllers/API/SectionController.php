@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\SectionResource;
 use Illuminate\Http\Request;
 use App\Models\Section;
+use App\Models\Student;
+use App\Models\StudentSection;
+use Illuminate\Validation\Rule;
 
 class SectionController extends Controller
 {
@@ -78,5 +81,29 @@ class SectionController extends Controller
         $section->delete();
 
         return response()->json(['message' => 'Section deleted successfully']);
+    }
+
+    public function addStudent(Section $section, Request $request)
+    {
+        if (!$section) {
+            return response()->json(['message' => 'Section not found'], 404);
+        }
+
+        $request->validate([
+            'academic_id' => 'required',
+        ]);
+
+        $student = Student::where('academic_id', $request->academic_id)->first();
+
+        if (!$student) {
+            return response()->json(['message' => 'Student not found'], 404);
+        }
+
+        if ($section->students()->where('student_id', $student->id)->exists()) {
+            return response()->json(['message' => 'Student already enrolled in this section'], 400);
+        }
+        $section->students()->attach($student->id);
+
+        return response()->json(['message' => 'Student added to section successfully']);
     }
 }

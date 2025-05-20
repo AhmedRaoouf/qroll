@@ -8,6 +8,7 @@ use App\Http\Resources\UserResource;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\Role;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
@@ -107,4 +108,30 @@ class StudentController extends Controller
 
         return response()->json(['message' => 'Student deleted successfully']);
     }
+
+    public function addCourses(Student $student, Request $request)
+    {
+        if (!$student) {
+            return response()->json([
+                'message' => 'Student not found',
+            ], 404);
+        }
+
+        $courseIds = $request->input('course_ids'); // مثلا: [1, 2, 3]
+
+        if (!is_array($courseIds) || empty($courseIds)) {
+            return response()->json([
+                'message' => 'No course IDs provided',
+            ], 400);
+        }
+
+        $student->courses()->sync($courseIds);
+
+        return response()->json([
+            'message' => 'Courses added successfully',
+            'student' => $student->load('courses') // تحميل الكورسات مع الطالب
+        ]);
+    }
+
+    
 }

@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CourseResource;
 use Illuminate\Http\Request;
 use App\Models\Course;
+use App\Models\Lecture;
+use App\Models\Section;
+use App\Models\Student;
 
 class CourseController extends Controller
 {
@@ -76,5 +79,84 @@ class CourseController extends Controller
         $course->delete();
 
         return response()->json(['message' => 'Course deleted successfully']);
+    }
+
+    public function sections(Course $course)
+    {
+        if (!$course) {
+            return response()->json([
+                'message' => 'Course not found',
+            ]);
+        }
+        $sections = $course->sections;
+        return response()->json(['data' => $sections]);
+    }
+
+    public function lectures(Course $course)
+    {
+        if (!$course) {
+            return response()->json([
+                'message' => 'Course not found',
+            ]);
+        }
+        $lectures = $course->lectures;
+        return response()->json(['data' => $lectures]);
+    }
+
+    public function allStudents($courseId)
+    {
+        $course = Course::with('students')->find($courseId);
+
+        if (!$course) {
+            return response()->json([
+                'message' => 'Course not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'course' => $course->name,
+            'students' => $course->students,
+        ]);
+    }
+
+    public function addStudent(Course $course, Request $request)
+    {
+        $request->validate([
+            'academic_id' => 'required',
+        ]);
+
+        $student = Student::where('academic_id', $request->academic_id)->first();
+
+        if (!$student) {
+            return response()->json(['message' => 'Student not found'], 404);
+        }
+
+        if ($course->students()->where('student_id', $student->id)->exists()) {
+            return response()->json(['message' => 'Student already enrolled in this course'], 400);
+        }
+
+        $course->students()->attach($student->id);
+
+        return response()->json(['message' => 'Student added to course successfully']);
+    }
+
+
+    public function myCourses()
+    {
+        $user = auth()->user();
+
+        if ($user->hasRole('student') && $user->student) {
+            return $user->student->courses;
+        }
+
+        if ($user->hasRole('doctor') && $user->doctor) {
+            return $user->doctor->courses;
+        }
+
+        if ($user->hasRole('teacher') && $user->teacher) {
+            return $user->teacher->courses;
+        }
+
+        return response()->json(['message' => 'No courses found for this user.'], 404);
     }
 }
