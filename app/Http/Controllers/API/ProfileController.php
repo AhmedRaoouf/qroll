@@ -13,7 +13,7 @@ class ProfileController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
         return response()->json([
             'data' => new UserResource($user)
         ]);
@@ -22,7 +22,7 @@ class ProfileController extends Controller
     public function update(ProfileRequest $request)
     {
         $data = $request->validated();
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
         if ($request->image) {
             if ($user->image && file_exists($user->image)) {
                 unlink(public_path($user->image));

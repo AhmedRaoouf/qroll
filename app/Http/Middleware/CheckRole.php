@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 class CheckRole
 {
@@ -15,9 +16,12 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        if (!in_array(auth()->user()->role?->name, $roles)) {
+        $user = Auth::guard('api')->user(); // اجبار استخدام الحارس api
+        if (!$user || !in_array($user->role?->name, $roles)) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
+
         return $next($request);
     }
+
 }

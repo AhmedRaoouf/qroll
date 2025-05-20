@@ -120,7 +120,7 @@ class LectureController extends Controller
             return response()->json(['message' => 'Lecture not found'], 404);
         }
 
-        $student = Auth::user();
+        $student = Auth::guard('api')->user();
 
         // تحقق إن الطالب مسجل في الكورس
         if (!$student->courses()->where('courses.id', $lecture->course_id)->exists()) {

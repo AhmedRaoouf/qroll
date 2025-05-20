@@ -10,7 +10,7 @@ class DashboardController extends Controller
 {
     public function myStats()
     {
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
         $data = [];
 
         if ($user->student) {

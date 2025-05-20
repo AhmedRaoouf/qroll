@@ -81,7 +81,7 @@ class SectionAbsenceController extends Controller
 
     public function getStudentSectionAbsences(Course $course)
     {
-        $student = Auth::user()->student;
+        $student = Auth::guard('api')->user()->student;
 
         if (!$student) {
             return response()->json(['message' => 'Student not found.'], 404);
