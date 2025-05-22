@@ -22,12 +22,14 @@ class TeacherRequest extends FormRequest
      */
     public function rules(): array
     {
+        $userId = $this->user?->id ?? null;
+
         return [
             'name'        => 'required|string|max:255',
-            'email'       => 'required|email|unique:users,email',
+            'email'       => 'required|email|unique:users,email,' . $userId,
             'password'    => 'required|string|min:6',
             'phone'       => 'nullable|string',
-            'national_id' => 'required|unique:users,national_id',
+            'national_id' => 'required|unique:users,national_id' .$userId,
             'birth_date'  => 'nullable|date',
             'address'     => 'nullable|string',
             'image'       => 'nullable|image|max:5096',

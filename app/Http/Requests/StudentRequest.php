@@ -23,7 +23,7 @@ class StudentRequest extends FormRequest
             'birth_date' => 'nullable|date',
             'address' => 'nullable|string|max:255',
             'password' => $this->isMethod('post') ? 'required|string|min:8' : 'nullable|string|min:8',
-            'academic_id' => 'required|integer|unique:students,academic_id,' . $this->route('student')?->id,
+            'academic_id' => 'required|integer|unique:students,academic_id,' . $this->user->student?->id,
         ];
     }
 
