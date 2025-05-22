@@ -2,38 +2,54 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Teacher;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
 class TeacherRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return Auth::guard('api')->check();
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
-        $userId = $this->user?->id ?? null;
+        $teacherId = $this->route('teacher');
+        $teacher = Teacher::find($teacherId) ?? null;
+        $userId = $teacher?->user?->id;
 
         return [
-            'name'        => 'required|string|max:255',
-            'email'       => 'required|email|unique:users,email,' . $userId,
-            'password'    => 'required|string|min:6',
-            'phone'       => 'nullable|string',
-            'national_id' => 'required|unique:users,national_id' .$userId,
-            'birth_date'  => 'nullable|date',
-            'address'     => 'nullable|string',
-            'image'       => 'nullable|image|max:5096',
-            'education'   => 'nullable|string',
+            'name' => [$this->isMethod('post') ? 'required' : 'sometimes', 'string', 'max:255'],
+            'email' => [
+                $this->isMethod('post') ? 'required' : 'sometimes',
+                'email',
+                'max:255',
+                'unique:users,email,' . ($userId ?? null),
+            ],
+            'password' => [$this->isMethod('post') ? 'required' : 'nullable', 'string', 'min:6'],
+            'phone' => ['nullable', 'string', 'max:15'],
+            'national_id' => [
+                $this->isMethod('post') ? 'required' : 'sometimes',
+                'string',
+                'max:255',
+                'unique:users,national_id,' . ($userId ?? null),
+            ],
+            'birth_date' => ['nullable', 'date'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'image' => ['nullable', 'image', 'max:5096'], // Max 5MB
+            'education' => ['nullable', 'string', 'max:255'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'email.unique' => 'The email has already been taken.',
+            'national_id.unique' => 'The national ID has already been taken.',
+            'image.image' => 'The file must be an image.',
+            'image.max' => 'The image must not exceed 5MB.',
         ];
     }
 }
