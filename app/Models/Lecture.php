@@ -9,6 +9,10 @@ class Lecture extends BaseModel
 {
     use SoftDeletes;
 
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
 
     public function students()
     {

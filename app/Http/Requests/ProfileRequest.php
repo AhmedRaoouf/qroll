@@ -23,7 +23,7 @@ class ProfileRequest extends FormRequest
      */
     public function rules(): array
     {
-        $user = Auth::guard()->user();
+        $user = Auth::guard('api')->user();
         return [
             'name'        => 'required|string|max:255',
             'email'       => 'required|email|unique:users,email,' . $user->id,

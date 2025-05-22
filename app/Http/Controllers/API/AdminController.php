@@ -42,7 +42,7 @@ class AdminController extends Controller
 
         return response()->json([
             'message' => 'Admin created successfully',
-            'data' => $admin->load('user'),
+            'data' => new UserResource($user),
         ], 201);
     }
 

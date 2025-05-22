@@ -17,8 +17,7 @@ class SectionResource extends JsonResource
         return [
             'id'         => $this->id,
             'name'       => $this->name,
-            'qr_code'    => $this->qr_code,
-            'course'     => new CourseResource($this->whenLoaded('course')),
+            'course'     => new CourseResource($this->course),
         ];
     }
 }
