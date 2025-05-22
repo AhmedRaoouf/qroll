@@ -9,6 +9,7 @@ use App\Models\Course;
 use App\Models\Lecture;
 use App\Models\Section;
 use App\Models\Student;
+use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
 {
@@ -143,7 +144,7 @@ class CourseController extends Controller
 
     public function myCourses()
     {
-        $user = auth()->user();
+        $user = Auth::guard('api')->user();
 
         if ($user->hasRole('student') && $user->student) {
             return $user->student->courses;

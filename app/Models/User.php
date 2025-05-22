@@ -77,4 +77,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Admin::class);
     }
+
+    public function hasRole(string $role): bool
+    {
+        return $this->role()->where('name', $role)->exists();
+    }
 }

@@ -13,20 +13,24 @@ class DashboardController extends Controller
         $user = Auth::guard('api')->user();
         $data = [];
 
-        if ($user->student) {
+        if ($user->hasRole('admin')) {
+            $data = [
+                'doctors_count' => \App\Models\Doctor::count(),
+                'teachers_count' => \App\Models\Teacher::count(),
+                'courses_count' => \App\Models\Course::count(),
+                'lectures_count' => \App\Models\Lecture::count(),
+                'students_count' => \App\Models\Student::count(),
+            ];
+        } elseif ($user->student) {
             $data['courses_count'] = $user->student->courses()->count();
-        }
-
-        if ($user->doctor) {
+        } elseif ($user->doctor) {
             $data['courses_count'] = $user->doctor->courses()->count();
             $data['students_count'] = $user->doctor->courses()->withCount('students')->get()->sum('students_count');
-        }
-
-        if ($user->teacher) {
+        } elseif ($user->teacher) {
             $data['courses_count'] = $user->teacher->courses()->count();
             $data['students_count'] = $user->teacher->courses()->withCount('students')->get()->sum('students_count');
         }
 
-        return response()->json($data);
+        return response()->json(['status' => 200, 'data' => $data]);
     }
 }
