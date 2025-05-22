@@ -33,7 +33,7 @@ class AdminController extends Controller
             'birth_date'  => $request->birth_date,
             'address'     => $request->address,
             'password'    => Hash::make($request->password),
-            'role_id'     => Role::where('name', 'Admin')->first()->id,
+            'role_id'     => Role::where('name', 'admin')->first()->id,
         ]);
 
         $admin = Admin::create([

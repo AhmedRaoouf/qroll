@@ -3,35 +3,35 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
 class StudentRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return Auth::guard('api')->check();
+        return true; // Adjust based on your authorization logic
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
+        $userId = $this->user?->id ?? null;
+
         return [
-            'name'        => 'required|string|max:255',
-            'email'       => 'required|email|unique:users,email',
-            'password'    => 'required|string|min:6',
-            'phone'       => 'nullable|string',
-            'national_id' => 'required|unique:users,national_id',
-            'academic_id' => 'required|interger',
-            'birth_date'  => 'nullable|date',
-            'address'     => 'nullable|string',
-            'image'       => 'nullable|image|max:5096',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $userId,
+            'phone' => 'nullable|string|max:15',
+            'national_id' => 'required|string|max:255|unique:users,national_id,' . $userId,
+            'birth_date' => 'nullable|date',
+            'address' => 'nullable|string|max:255',
+            'password' => $this->isMethod('post') ? 'required|string|min:8' : 'nullable|string|min:8',
+            'academic_id' => 'required|integer|unique:students,academic_id,' . $this->route('student')?->id,
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'academic_id.integer' => 'The academic ID must be an integer.',
+            'academic_id.unique' => 'The academic ID has already been taken.',
         ];
     }
 }

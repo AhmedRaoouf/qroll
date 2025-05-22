@@ -25,7 +25,7 @@ class StudentController extends Controller
 
     public function store(StudentRequest $request)
     {
-        $role = Role::where('name', 'Student')->first();
+        $role = Role::where('name', 'student')->first();
         if (!$role) {
             return response()->json(['message' => 'Student role not found'], 422);
         }
@@ -133,5 +133,5 @@ class StudentController extends Controller
         ]);
     }
 
-    
+
 }

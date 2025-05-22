@@ -25,7 +25,7 @@ class DoctorController extends Controller
 
     public function store(TeacherRequest $request)
     {
-        $role = Role::where('name', 'Doctor')->first();
+        $role = Role::where('name', 'doctor')->first();
         if (!$role) {
             return response()->json(['message' => 'Doctor role not found'], 422);
         }
