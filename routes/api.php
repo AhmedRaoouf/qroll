@@ -9,15 +9,12 @@ use App\Http\Controllers\API\{
     CourseController,
     SectionController,
     LectureController,
-    StudentSectionController,
-    StudentLectureController,
-    AbsenceController,
     AuthController,
     ProfileController,
     RoleController,
     SectionAbsenceController,
-    UserController,
-    DashboardController
+    DashboardController,
+    LectureAbsenceController
 };
 
 // 🟡 Guest Routes
@@ -52,32 +49,35 @@ Route::middleware('api-auth')->group(function () {
         Route::apiResource('sections', SectionController::class);
         Route::apiResource('lectures', LectureController::class);
         Route::apiResource('courses', CourseController::class);
-        Route::get('courses/{course}/students', [CourseController::class, 'allStudents']);
     });
 
     // 🧑‍⚕️ Doctor Routes
     Route::prefix('doctor')->middleware(['check.role:doctor'])->group(function () {
         Route::post('courses/{course}/add-student', [CourseController::class, 'addStudent']);
-        Route::get('courses/{course}/students', [CourseController::class, 'allStudents']);
         Route::get('lectures/{lecture}/generate-qr', [LectureController::class, 'generateQR']);
+    });
 
+    Route::middleware(['auth:sanctum', 'check.role:admin,doctor,teacher'])->group(function () {
+        Route::get('courses/{course}/students', [CourseController::class, 'allStudents']);
     });
 
     // 👨‍🏫 Teacher Routes
     Route::prefix('teacher')->middleware(['check.role:teacher'])->group(function () {
         Route::post('sections/{section}/add-student', [SectionController::class, 'addStudent']);
+        Route::get('sections/{section}/generate-qr', [SectionController::class, 'generateQR']);
     });
 
     // 👨‍🎓 Student Routes
     Route::prefix('student')->middleware(['check.role:student'])->group(function () {
-        Route::get('courses/{course}/lecture-attendance', [AbsenceController::class, 'getStudentLectureAbsences']);
+        Route::get('courses/{course}/lecture-attendance', [LectureAbsenceController::class, 'getStudentLectureAbsences']);
         Route::get('courses/{course}/section-attendance', [SectionAbsenceController::class, 'getStudentSectionAbsences']);
-        Route::post('student/attendance/scan', [LectureController::class, 'scanQR']);
+        Route::post('student/lecture-attendance/scan', [LectureController::class, 'scanQR']);
+        Route::post('student/section-attendance/scan', [SectionController::class, 'scanQR']);
     });
 
     // 📊 Absence Reports
-    Route::get('courses/{course}/excessive-absence/lectures', [AbsenceController::class, 'getAbsencesByCourse']);
+    Route::get('courses/{course}/excessive-absence/lectures', [LectureAbsenceController::class, 'getAbsencesByCourse']);
     Route::get('courses/{course}/excessive-absence/sections', [SectionAbsenceController::class, 'getAbsencesByCourse']);
-    Route::get('courses/{course}/lectures/{lecture}/attendance', [AbsenceController::class, 'getAbsencesByLecture']);
+    Route::get('courses/{course}/lectures/{lecture}/attendance', [LectureAbsenceController::class, 'getAbsencesByLecture']);
     Route::get('courses/{course}/sections/{section}/attendance', [SectionAbsenceController::class, 'getAbsencesBySection']);
 });

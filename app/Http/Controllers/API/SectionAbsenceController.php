@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Models\SectionAbsence;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Absence;
 use App\Models\Course;
 use App\Models\Section;
 use App\Models\Student;
+use App\Models\StudentSection;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,7 +23,7 @@ class SectionAbsenceController extends Controller
         $sections = Section::where('course_id', $course->id)->pluck('id');
 
         $data = $students->map(function ($student) use ($sections) {
-            $absentsections = SectionAbsence::where('student_id', $student->id)
+            $absentsections = StudentSection::where('student_id', $student->id)
                 ->whereIn('lecture_id', $sections)
                 ->pluck('lecture_id');
 
@@ -59,7 +59,7 @@ class SectionAbsenceController extends Controller
         })->get();
 
         $data = $students->map(function ($student) use ($section) {
-            $absence = SectionAbsence::where('student_id', $student->id)
+            $absence = StudentSection::where('student_id', $student->id)
                 ->where('section_id', $section->id)
                 ->first();
 
@@ -89,7 +89,7 @@ class SectionAbsenceController extends Controller
         $sections = Section::where('course_id',$course->id)->get();
 
         $data = $sections->map(function ($section) use ($student) {
-            $absence = SectionAbsence::where('student_id', $student->id)
+            $absence = StudentSection::where('student_id', $student->id)
             ->where('section_id',$section->id)
             ->first();
 

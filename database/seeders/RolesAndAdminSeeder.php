@@ -15,7 +15,7 @@ class RolesAndAdminSeeder extends Seeder
      */
     public function run(): void
     {
-        $roles = ['Admin', 'Doctor', 'Teacher', 'Student'];
+        $roles = ['admin', 'doctor', 'teacher', 'student'];
 
         foreach ($roles as $role) {
             Role::updateOrCreate(['name' => $role]);

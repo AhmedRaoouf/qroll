@@ -31,12 +31,15 @@ class UserResource extends JsonResource
         // Add extra info based on role
         switch (strtolower($this->role?->name)) {
             case 'doctor':
+                $data['doctor_id'] = $this->doctor?->id;
                 $data['education'] = $this->doctor?->education;
                 break;
-            case 'teacher':
-                $data['education'] = $this->teacher?->education;
+                case 'teacher':
+                    $data['teacher_id'] = $this->teacher?->id;
+                    $data['education'] = $this->teacher?->education;
                 break;
             case 'student':
+                $data['student_id'] = $this->student?->id;
                 $data['academic_id'] = $this->student?->academic_id;
                 break;
         }

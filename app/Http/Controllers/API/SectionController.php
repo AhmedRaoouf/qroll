@@ -8,7 +8,9 @@ use Illuminate\Http\Request;
 use App\Models\Section;
 use App\Models\Student;
 use App\Models\StudentSection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class SectionController extends Controller
 {
@@ -105,5 +107,61 @@ class SectionController extends Controller
         $section->students()->attach($student->id);
 
         return response()->json(['message' => 'Student added to section successfully']);
+    }
+
+    public function generateQR(Section $section)
+    {
+        $payload = [
+            'section_id' => $section->id,
+            'course_id' => $section->course_id,
+            'timestamp' => now()->timestamp,
+            'signature' => hash_hmac('sha256', $section->id . now()->timestamp, config('app.key'))
+        ];
+
+        $qrContent = json_encode($payload);
+        $section->update(['qr_code' => $qrContent]);
+        return response()->json([
+            'qr' => base64_encode(QrCode::format('png')->size(200)->generate($qrContent))
+        ]);
+    }
+
+    public function scanQR(Request $request)
+    {
+        $data = json_decode($request->input('data'), true);
+
+        if (!$data || !isset($data['section_id'], $data['timestamp'], $data['signature'])) {
+            return response()->json(['message' => 'Invalid QR data'], 422);
+        }
+
+        $validSignature = hash_hmac('sha256', $data['section_id'] . $data['timestamp'], config('app.key'));
+        if ($validSignature !== $data['signature']) {
+            return response()->json(['message' => 'QR code tampered'], 403);
+        }
+
+        // if (now()->timestamp - $data['timestamp'] > 600) {
+        //     return response()->json(['message' => 'QR code expired'], 410);
+        // }
+
+        $section = Section::find($data['section_id']);
+        if (!$section) {
+            return response()->json(['message' => 'section not found'], 404);
+        }
+
+        $student = Auth::guard('api')->user();
+
+        // تحقق إن الطالب مسجل في الكورس
+        if (!$student->courses()->where('courses.id', $section->course_id)->exists()) {
+            return response()->json(['message' => 'Not enrolled'], 403);
+        }
+
+        // تسجيل الحضور
+        StudentSection::updateOrCreate([
+            'student_id' => $student->id,
+            'section_id' => $section->id
+        ], [
+            'status' => 'true'
+        ]);
+
+        return response()->json(['message' => 'Attendance recorded']);
     }
 }

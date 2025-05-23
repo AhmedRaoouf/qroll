@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-
-use App\Models\Absence;
 use App\Models\Course;
 use App\Models\Lecture;
 use App\Models\Student;
-use Carbon\Carbon;
+use App\Models\StudentLecture;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class AbsenceController extends Controller
+class LectureAbsenceController extends Controller
 {
     public function getAbsencesByCourse(Course $course)
     {
@@ -22,7 +21,7 @@ class AbsenceController extends Controller
         $lectures = Lecture::where('course_id', $course->id)->pluck('id');
 
         $data = $students->map(function ($student) use ($lectures) {
-            $absentLectures = Absence::where('student_id', $student->id)
+            $absentLectures = StudentLecture::where('student_id', $student->id)
                 ->whereIn('lecture_id', $lectures)
                 ->pluck('lecture_id');
 
@@ -55,7 +54,7 @@ class AbsenceController extends Controller
         })->get();
 
         $data = $students->map(function ($student) use ($lecture) {
-            $absence = Absence::where('student_id', $student->id)
+            $absence = StudentLecture::where('student_id', $student->id)
                 ->where('lecture_id', $lecture->id)
                 ->first();
 
@@ -89,7 +88,7 @@ class AbsenceController extends Controller
 
         // Prepare data
         $data = $lectures->map(function ($lecture) use ($student) {
-            $absence = Absence::where('student_id', $student->id)
+            $absence = StudentLecture::where('student_id', $student->id)
                 ->where('lecture_id', $lecture->id)
                 ->first();
 

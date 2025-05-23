@@ -82,8 +82,9 @@ class CourseController extends Controller
         return response()->json(['message' => 'Course deleted successfully']);
     }
 
-    public function sections(Course $course)
+    public function sections(string $id)
     {
+        $course = Course::find($id);
         if (!$course) {
             return response()->json([
                 'message' => 'Course not found',
@@ -93,8 +94,9 @@ class CourseController extends Controller
         return response()->json(['data' => $sections]);
     }
 
-    public function lectures(Course $course)
+    public function lectures(string $id)
     {
+        $course = Course::find($id);
         if (!$course) {
             return response()->json([
                 'message' => 'Course not found',
@@ -120,8 +122,14 @@ class CourseController extends Controller
         ]);
     }
 
-    public function addStudent(Course $course, Request $request)
+    public function addStudent(string $id, Request $request)
     {
+        $course = Course::find($id);
+        if (!$course) {
+            return response()->json([
+                'message' => 'Course not found',
+            ]);
+        }
         $request->validate([
             'academic_id' => 'required',
         ]);

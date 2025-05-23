@@ -112,26 +112,30 @@ class StudentController extends Controller
     public function addCourses(Student $student, Request $request)
     {
         if (!$student) {
-            return response()->json([
-                'message' => 'Student not found',
-            ], 404);
+            return response()->json(['message' => 'Student not found'], 404);
         }
 
-        $courseIds = $request->input('course_ids'); // مثلا: [1, 2, 3]
+        $request->validate([
+            'course_ids' => 'required|array|min:1',
+            'course_ids.*' => 'integer|exists:courses,id', 
+        ]);
 
-        if (!is_array($courseIds) || empty($courseIds)) {
+        $courseIds = $request->input('course_ids');
+
+        // Check if the student is already enrolled in any of the courses
+        $existingCourses = $student->courses()->whereIn('courses.id', $courseIds)->pluck('courses.id')->toArray();
+        if (!empty($existingCourses)) {
             return response()->json([
-                'message' => 'No course IDs provided',
+                'message' => 'Student is already enrolled in courses: ' . implode(', ', $existingCourses),
             ], 400);
         }
 
+        // Sync the courses (attach new courses, keep existing ones)
         $student->courses()->sync($courseIds);
 
         return response()->json([
             'message' => 'Courses added successfully',
-            'student' => $student->load('courses') // تحميل الكورسات مع الطالب
+            'student' => $student->load('courses'), // Load courses with the student
         ]);
     }
-
-
 }

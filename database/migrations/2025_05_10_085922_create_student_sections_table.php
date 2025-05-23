@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained('students')->onDelete('cascade');
             $table->foreignId('section_id')->constrained('sections')->onDelete('cascade');
+            $table->enum('status',['true','false'])->default('false');
+            $table->timestamps();
         });
     }
 
