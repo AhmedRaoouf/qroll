@@ -12,8 +12,12 @@ use Illuminate\Support\Facades\Auth;
 
 class LectureAbsenceController extends Controller
 {
-    public function getAbsencesByCourse(Course $course)
+    public function getAbsencesByCourse(string $courseId)
     {
+        $course = Course::find($courseId);
+        if (! $course) {
+            return response()->json(['error' => 'Course not found'], 404);
+        }
         $students = Student::whereHas('lectures.course', function ($q) use ($course) {
             $q->where('id', $course->id);
         })->get();
@@ -45,9 +49,16 @@ class LectureAbsenceController extends Controller
     }
 
 
-    public function getAbsencesByLecture(Course $course, Lecture $lecture)
+    public function getAbsencesByLecture(string $courseId, string $lectureId)
     {
-
+        $course = Course::find($courseId);
+        $lecture = Lecture::find($lectureId);
+        if (! $course) {
+            return response()->json(['error' => 'Course not found'], 404);
+        }
+        if ($lecture?->course_id !== $course?->id) {
+            return response()->json(['message' => 'Lecture does not belong to this course.'], 404);
+        }
         $students = Student::whereHas('lectures', function ($q) use ($lecture, $course) {
             $q->where('lectures.id', $lecture->id)
                 ->where('lectures.course_id', $course->id);
@@ -75,10 +86,14 @@ class LectureAbsenceController extends Controller
         return response()->json($data);
     }
 
-    public function getStudentLectureAbsences(Course $course)
+    public function getStudentLectureAbsences(string $courseId)
     {
+        $course = Course::find($courseId);
+        if (! $course) {
+            return response()->json(['error' => 'Course not found'], 404);
+        }
+        
         $student = Auth::guard('api')->user()->student;
-
         if (!$student) {
             return response()->json(['message' => 'Student not found.'], 404);
         }

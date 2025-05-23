@@ -14,8 +14,12 @@ use Illuminate\Support\Facades\Auth;
 
 class SectionAbsenceController extends Controller
 {
-    public function getAbsencesByCourse(Course $course)
+    public function getAbsencesByCourse(string $id)
     {
+        $course = Course::find($id);
+        if (! $course) {
+            return response()->json(['error' => 'Course not found'], 404);
+        }
         $students = Student::whereHas('sections.course', function ($q) use ($course) {
             $q->where('id', $course->id);
         })->get();
@@ -47,9 +51,14 @@ class SectionAbsenceController extends Controller
     }
 
 
-    public function getAbsencesBySection(Course $course, Section $section)
+    public function getAbsencesBySection(string $courseId, string $sectionId)
     {
-        if ($section->course_id !== $course->id) {
+        $course = Course::find($courseId);
+        if (! $course) {
+            return response()->json(['error' => 'Course not found'], 404);
+        }
+        $section = Section::find($sectionId);
+        if ($section?->course_id !== $course?->id) {
             return response()->json(['message' => 'Section does not belong to this course.'], 404);
         }
 
@@ -79,19 +88,22 @@ class SectionAbsenceController extends Controller
         return response()->json($data);
     }
 
-    public function getStudentSectionAbsences(Course $course)
+    public function getStudentSectionAbsences(string $id)
     {
         $student = Auth::guard('api')->user()->student;
-
+        $course = Course::find($id);
+        if (! $course) {
+            return response()->json(['error' => 'Course not found'], 404);
+        }
         if (!$student) {
             return response()->json(['message' => 'Student not found.'], 404);
         }
-        $sections = Section::where('course_id',$course->id)->get();
+        $sections = Section::where('course_id', $course->id)->get();
 
         $data = $sections->map(function ($section) use ($student) {
             $absence = StudentSection::where('student_id', $student->id)
-            ->where('section_id',$section->id)
-            ->first();
+                ->where('section_id', $section->id)
+                ->first();
 
             $status = $absence && $absence->status === true ? 'Present' : 'Absent';
             return [

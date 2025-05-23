@@ -145,8 +145,13 @@ class CourseController extends Controller
         }
 
         $course->students()->attach($student->id);
+        foreach ($course->lectures as $lecture) {
+            if (!$lecture->students()->where('student_id', $student->id)->exists()) {
+                $lecture->students()->attach($student->id);
+            }
+        }
 
-        return response()->json(['message' => 'Student added to course successfully']);
+        return response()->json(['message' => 'Student added to course and lectures successfully']);
     }
 
 
