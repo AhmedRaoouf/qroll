@@ -122,7 +122,7 @@ class CourseController extends Controller
         ]);
     }
 
-    public function addStudent(string $id, Request $request)
+    public function addStudentToCourse(string $id, Request $request)
     {
         $course = Course::find($id);
         if (!$course) {
@@ -147,11 +147,49 @@ class CourseController extends Controller
         $course->students()->attach($student->id);
         foreach ($course->lectures as $lecture) {
             if (!$lecture->students()->where('student_id', $student->id)->exists()) {
-                $lecture->students()->attach($student->id);
+                $lecture->students()->attach($student->id, [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
         }
 
+
         return response()->json(['message' => 'Student added to course and lectures successfully']);
+    }
+
+    public function addStudentToSections(string $id, Request $request)
+    {
+        $request->validate([
+            'academic_id' => 'required',
+        ]);
+
+        $course = Course::find($id);
+        if (!$course) {
+            return response()->json(['message' => 'Course not found'], 404);
+        }
+
+        $student = Student::where('academic_id', $request->academic_id)->first();
+        if (!$student) {
+            return response()->json(['message' => 'Student not found'], 404);
+        }
+
+        // تأكد إنه بالفعل مضاف للكورس
+        if (!$course->students()->where('student_id', $student->id)->exists()) {
+            return response()->json(['message' => 'Student is not enrolled in this course'], 400);
+        }
+
+        // ضيفه لكل السكاشن المرتبطة بالكورس
+        foreach ($course->sections as $section) {
+            if (!$section->students()->where('student_id', $student->id)->exists()) {
+                $section->students()->attach($student->id, [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        return response()->json(['message' => 'Student added to all sections in the course successfully']);
     }
 
 

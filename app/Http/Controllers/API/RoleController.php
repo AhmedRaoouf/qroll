@@ -12,7 +12,7 @@ class RoleController extends Controller
     public function index()
     {
         return response()->json([
-            'data' => RoleResouce::collection(Role::get(['name'])),
+            'data' => RoleResouce::collection(Role::get()),
         ]);
     }
 

@@ -51,20 +51,13 @@ Route::middleware('api-auth')->group(function () {
         Route::apiResource('courses', CourseController::class);
     });
 
-    // 🧑‍⚕️ Doctor Routes
-    Route::prefix('doctor')->middleware(['check.role:doctor'])->group(function () {
-        Route::post('courses/{course}/add-student', [CourseController::class, 'addStudent']);
-        Route::get('lectures/{lecture}/generate-qr', [LectureController::class, 'generateQR']);
-    });
-
     Route::middleware(['auth:sanctum', 'check.role:admin,doctor,teacher'])->group(function () {
         Route::get('courses/{course}/students', [CourseController::class, 'allStudents']);
-    });
-
-    // 👨‍🏫 Teacher Routes
-    Route::prefix('teacher')->middleware(['check.role:teacher'])->group(function () {
-        Route::post('sections/{section}/add-student', [SectionController::class, 'addStudent']);
+        Route::post('courses/{course}/add-student', [CourseController::class, 'addStudentToCourse']);
+        Route::post('courses/{course}/add-student-to-section', [CourseController::class, 'addStudentToSections']);
+        Route::get('lectures/{lecture}/generate-qr', [LectureController::class, 'generateQR']);
         Route::get('sections/{section}/generate-qr', [SectionController::class, 'generateQR']);
+
     });
 
     // 👨‍🎓 Student Routes
