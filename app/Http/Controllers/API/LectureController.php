@@ -82,8 +82,12 @@ class LectureController extends Controller
     }
 
 
-    public function generateQR(Lecture $lecture)
+    public function generateQR(string $id)
     {
+        $lecture = Lecture::find($id);
+        if (!$lecture) {
+            return response()->json(['message' => 'Lecture not found'], 404);
+        }
         $payload = [
             'lecture_id' => $lecture->id,
             'course_id' => $lecture->course_id,
@@ -133,7 +137,7 @@ class LectureController extends Controller
             'lecture_id' => $lecture->id
         ], [
             'status' => 'true',
-            'updated_at'=>now(),
+            'updated_at' => now(),
 
         ]);
 

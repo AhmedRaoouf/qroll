@@ -86,8 +86,12 @@ class SectionController extends Controller
     }
 
 
-    public function generateQR(Section $section)
+    public function generateQR(string $id)
     {
+        $section = Section::find($id);
+        if (!$section) {
+            return response()->json(['message' => 'Section not found'], 404);
+        }
         $payload = [
             'section_id' => $section->id,
             'course_id' => $section->course_id,
@@ -137,7 +141,7 @@ class SectionController extends Controller
             'section_id' => $section->id
         ], [
             'status' => 'true',
-            'updated_at'=>now(),
+            'updated_at' => now(),
         ]);
 
         return response()->json(['message' => 'Attendance recorded']);
