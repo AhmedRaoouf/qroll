@@ -109,15 +109,16 @@ class StudentController extends Controller
         return response()->json(['message' => 'Student deleted successfully']);
     }
 
-    public function addCourses(Student $student, Request $request)
+    public function addCourses(string $id, Request $request)
     {
+        $student = Student::find($id);
         if (!$student) {
             return response()->json(['message' => 'Student not found'], 404);
         }
 
         $request->validate([
             'course_ids' => 'required|array|min:1',
-            'course_ids.*' => 'integer|exists:courses,id', 
+            'course_ids.*' => 'integer|exists:courses,id',
         ]);
 
         $courseIds = $request->input('course_ids');

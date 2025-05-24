@@ -54,7 +54,7 @@ Route::middleware('api-auth')->group(function () {
     Route::middleware(['auth:sanctum', 'check.role:admin,doctor,teacher'])->group(function () {
         Route::get('courses/{course}/students', [CourseController::class, 'allStudents']);
         Route::post('courses/{course}/add-student', [CourseController::class, 'addStudentToCourse']);
-        Route::post('courses/{course}/add-student-to-section', [CourseController::class, 'addStudentToSections']);
+        Route::post('courses/{course}/add-student-to-sections', [CourseController::class, 'addStudentToSections']);
         Route::get('lectures/{lecture}/generate-qr', [LectureController::class, 'generateQR']);
         Route::get('sections/{section}/generate-qr', [SectionController::class, 'generateQR']);
 
@@ -62,8 +62,8 @@ Route::middleware('api-auth')->group(function () {
 
     // 👨‍🎓 Student Routes
     Route::prefix('student')->middleware(['check.role:student'])->group(function () {
-        Route::get('courses/{course}/lecture-attendance', [LectureAbsenceController::class, 'getStudentLectureAbsences']);
-        Route::get('courses/{course}/section-attendance', [SectionAbsenceController::class, 'getStudentSectionAbsences']);
+        Route::get('courses/{course}/lectures-attendance', [LectureAbsenceController::class, 'getStudentLectureAbsences']);
+        Route::get('courses/{course}/sections-attendance', [SectionAbsenceController::class, 'getStudentSectionAbsences']);
         Route::post('student/lecture-attendance/scan', [LectureController::class, 'scanQR']);
         Route::post('student/section-attendance/scan', [SectionController::class, 'scanQR']);
     });
