@@ -132,7 +132,9 @@ class LectureController extends Controller
             'student_id' => $student->id,
             'lecture_id' => $lecture->id
         ], [
-            'status' => 'true'
+            'status' => 'true',
+            'updated_at'=>now(),
+
         ]);
 
         return response()->json(['message' => 'Attendance recorded']);

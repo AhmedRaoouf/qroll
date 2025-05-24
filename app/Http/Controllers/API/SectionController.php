@@ -85,7 +85,7 @@ class SectionController extends Controller
         return response()->json(['message' => 'Section deleted successfully']);
     }
 
-    
+
     public function generateQR(Section $section)
     {
         $payload = [
@@ -136,7 +136,8 @@ class SectionController extends Controller
             'student_id' => $student->id,
             'section_id' => $section->id
         ], [
-            'status' => 'true'
+            'status' => 'true',
+            'updated_at'=>now(),
         ]);
 
         return response()->json(['message' => 'Attendance recorded']);
