@@ -37,7 +37,7 @@ class StudentController extends Controller
             'national_id' => $request->national_id,
             'birth_date'  => $request->birth_date,
             'address'     => $request->address,
-            'password'    => Hash::make($request->national_id),
+            'password'    => Hash::make($request->password),
             'role_id'     => $role->id,
         ]);
 
