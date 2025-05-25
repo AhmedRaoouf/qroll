@@ -139,4 +139,42 @@ class StudentController extends Controller
             'student' => $student->load('courses'), // Load courses with the student
         ]);
     }
+
+    // لإرجاع الكورسات المرتبطة بالطالب
+    public function courses($studentId)
+    {
+        $student = Student::with('courses')->find($studentId);
+
+        if (!$student) {
+            return response()->json(['message' => 'Student not found'], 404);
+        }
+
+        return response()->json([
+            'message' => 'Student courses retrieved successfully',
+            'student' => new UserResource($student->user),
+            'courses' => $student->courses,
+        ]);
+    }
+
+    // لإزالة كورسات معينة من الطالب
+    public function removeCourses($studentId, Request $request)
+    {
+        $student = Student::find($studentId);
+
+        if (!$student) {
+            return response()->json(['message' => 'Student not found'], 404);
+        }
+
+        $request->validate([
+            'course_ids' => 'required|array|min:1',
+            'course_ids.*' => 'integer|exists:courses,id',
+        ]);
+
+        $student->courses()->detach($request->course_ids);
+
+        return response()->json([
+            'message' => 'Courses removed successfully',
+            'remaining_courses' => $student->courses, // Optional
+        ]);
+    }
 }

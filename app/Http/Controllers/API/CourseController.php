@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CourseResource;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use App\Models\Course;
 use App\Models\Lecture;
@@ -118,6 +119,7 @@ class CourseController extends Controller
 
         return response()->json([
             'course' => $course->name,
+
             'students' => $course->students,
         ]);
     }
