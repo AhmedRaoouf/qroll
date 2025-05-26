@@ -30,13 +30,5 @@ class Student extends BaseModel
         return $this->belongsToMany(Lecture::class, 'student_lectures', 'student_id', 'lecture_id');
     }
 
-    public function absences()
-    {
-        return $this->hasMany(Absence::class, 'student_id');
-    }
 
-    public function section_absences()
-    {
-        return $this->hasMany(SectionAbsence::class, 'student_id');
-    }
 }

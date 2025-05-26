@@ -8,6 +8,7 @@ use App\Http\Resources\UserResource;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\StudentCourse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -141,9 +142,9 @@ class StudentController extends Controller
     }
 
     // لإرجاع الكورسات المرتبطة بالطالب
-    public function courses($studentId)
+    public function courses(string $id)
     {
-        $student = Student::with('courses')->find($studentId);
+        $student = Student::with('courses')->find($id);
 
         if (!$student) {
             return response()->json(['message' => 'Student not found'], 404);
