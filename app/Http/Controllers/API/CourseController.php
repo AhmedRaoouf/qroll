@@ -109,7 +109,7 @@ class CourseController extends Controller
 
     public function allStudents($courseId)
     {
-        $course = Course::with('students')->find($courseId);
+        $course = Course::with('students.user')->find($courseId); // eager load user داخل students
 
         if (!$course) {
             return response()->json([
@@ -117,11 +117,17 @@ class CourseController extends Controller
             ], 404);
         }
 
+        // جلب الـ users المرتبطين بالطلاب
+        $users = $course->students->map(function ($student) {
+            return $student->user;
+        });
+
         return response()->json([
-            'course' => $course->name,
-            'students' => UserResource::collection($course->students->user)
+            'course'   => $course->name,
+            'students' => UserResource::collection($users),
         ]);
     }
+
 
     public function addStudentToCourse(string $id, Request $request)
     {
