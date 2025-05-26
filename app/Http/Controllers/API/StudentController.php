@@ -124,22 +124,15 @@ class StudentController extends Controller
 
         $courseIds = $request->input('course_ids');
 
-        // Check if the student is already enrolled in any of the courses
-        $existingCourses = $student->courses()->whereIn('courses.id', $courseIds)->pluck('courses.id')->toArray();
-        if (!empty($existingCourses)) {
-            return response()->json([
-                'message' => 'Student is already enrolled in courses: ' . implode(', ', $existingCourses),
-            ], 400);
-        }
-
-        // Sync the courses (attach new courses, keep existing ones)
+        // Sync courses: remove old, attach new
         $student->courses()->sync($courseIds);
 
         return response()->json([
-            'message' => 'Courses added successfully',
-            'student' => $student->load('courses'), // Load courses with the student
+            'message' => 'Courses synced successfully',
+            'student' => $student->load('courses'),
         ]);
     }
+
 
     // لإرجاع الكورسات المرتبطة بالطالب
     public function courses(string $id)
