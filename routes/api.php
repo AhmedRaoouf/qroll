@@ -45,9 +45,9 @@ Route::middleware('api-auth')->group(function () {
         Route::apiResource('doctors', DoctorController::class);
         Route::apiResource('teachers', TeacherController::class);
         Route::apiResource('students', StudentController::class);
+        Route::get('students/{student}/courses',[StudentController::class, 'courses']);
         Route::post('students/{student}/add-courses', [StudentController::class, 'addCourses']);
         Route::post('students/{student}/remove-courses', [StudentController::class, 'removeCourses']);
-        Route::get('students/{student}/courses',[StudentController::class, 'courses']);
         Route::apiResource('sections', SectionController::class);
         Route::apiResource('lectures', LectureController::class);
         Route::apiResource('courses', CourseController::class);

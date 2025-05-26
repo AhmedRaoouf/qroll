@@ -33,16 +33,22 @@ class UserResource extends JsonResource
             case 'doctor':
                 $data['doctor_id'] = $this->doctor?->id;
                 $data['education'] = $this->doctor?->education;
+                $data['courses']   = CourseResource::collection($this->doctor?->courses);
                 break;
-                case 'teacher':
-                    $data['teacher_id'] = $this->teacher?->id;
-                    $data['education'] = $this->teacher?->education;
+
+            case 'teacher':
+                $data['teacher_id'] = $this->teacher?->id;
+                $data['education']  = $this->teacher?->education;
+                $data['courses']    = CourseResource::collection($this->teacher?->courses);
                 break;
+
             case 'student':
-                $data['student_id'] = $this->student?->id;
+                $data['student_id']  = $this->student?->id;
                 $data['academic_id'] = $this->student?->academic_id;
+                $data['courses']     = CourseResource::collection($this->student?->courses);
                 break;
         }
+
 
         return $data;
     }
