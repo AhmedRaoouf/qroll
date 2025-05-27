@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StudentRequest;
 use App\Http\Resources\UserResource;
+use App\Models\Lecture;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\Role;
@@ -127,6 +128,10 @@ class StudentController extends Controller
         // Sync courses: remove old, attach new
         $student->courses()->sync($courseIds);
 
+        $lectureIds = Lecture::whereIn('course_id', $courseIds)->pluck('id')->toArray();
+
+        // Sync lectures to student
+        $student->lectures()->sync($lectureIds);
         return response()->json([
             'message' => 'Courses synced successfully',
             'student' => $student->load('courses'),
@@ -150,25 +155,4 @@ class StudentController extends Controller
         ]);
     }
 
-    // لإزالة كورسات معينة من الطالب
-    public function removeCourses($studentId, Request $request)
-    {
-        $student = Student::find($studentId);
-
-        if (!$student) {
-            return response()->json(['message' => 'Student not found'], 404);
-        }
-
-        $request->validate([
-            'course_ids' => 'required|array|min:1',
-            'course_ids.*' => 'integer|exists:courses,id',
-        ]);
-
-        $student->courses()->detach($request->course_ids);
-
-        return response()->json([
-            'message' => 'Courses removed successfully',
-            'remaining_courses' => $student->courses, // Optional
-        ]);
-    }
 }

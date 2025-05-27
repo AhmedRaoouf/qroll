@@ -14,7 +14,8 @@ use App\Http\Controllers\API\{
     RoleController,
     SectionAbsenceController,
     DashboardController,
-    LectureAbsenceController
+    LectureAbsenceController,
+    UserImportController
 };
 
 // 🟡 Guest Routes
@@ -45,20 +46,20 @@ Route::middleware('api-auth')->group(function () {
         Route::apiResource('doctors', DoctorController::class);
         Route::apiResource('teachers', TeacherController::class);
         Route::apiResource('students', StudentController::class);
-        Route::get('students/{student}/courses',[StudentController::class, 'courses']);
+        Route::get('students/{student}/courses', [StudentController::class, 'courses']);
         Route::post('students/{student}/add-courses', [StudentController::class, 'addCourses']);
-        Route::apiResource('sections', SectionController::class);
-        Route::apiResource('lectures', LectureController::class);
         Route::apiResource('courses', CourseController::class);
+        Route::post('import-users', [UserImportController::class, 'import']);
     });
 
     Route::middleware(['auth:sanctum', 'check.role:admin,doctor,teacher'])->group(function () {
         Route::get('courses/{course}/students', [CourseController::class, 'allStudents']);
         Route::post('courses/{course}/add-student', [CourseController::class, 'addStudentToCourse']);
         Route::post('courses/{course}/add-student-to-sections', [CourseController::class, 'addStudentToSections']);
+        Route::apiResource('sections', SectionController::class);
+        Route::apiResource('lectures', LectureController::class);
         Route::get('lectures/{lecture}/generate-qr', [LectureController::class, 'generateQR']);
         Route::get('sections/{section}/generate-qr', [SectionController::class, 'generateQR']);
-
     });
 
     // 👨‍🎓 Student Routes
