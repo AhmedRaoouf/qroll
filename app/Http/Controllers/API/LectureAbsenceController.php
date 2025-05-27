@@ -37,7 +37,7 @@ class LectureAbsenceController extends Controller
 
             return [
                 'id' => $student->id,
-                'name' => $student->name,
+                'name' => $student->user->name,
                 'academic_id' => $student->academic_id,
                 'number_of_absence' => $absentCount,
                 'lecture_numbers' => $absentLectures->implode(','),
@@ -77,7 +77,7 @@ class LectureAbsenceController extends Controller
 
             return [
                 'id' => $student->id,
-                'name' => $student->name,
+                'name' => $student->user->name,
                 'academic_id' => $student->academic_id,
                 'status' => $status,
             ];
@@ -92,7 +92,7 @@ class LectureAbsenceController extends Controller
         if (! $course) {
             return response()->json(['error' => 'Course not found'], 404);
         }
-        
+
         $student = Auth::guard('api')->user()->student;
         if (!$student) {
             return response()->json(['message' => 'Student not found.'], 404);
