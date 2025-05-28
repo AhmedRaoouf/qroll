@@ -128,8 +128,7 @@ class SectionController extends Controller
             return response()->json(['message' => 'section not found'], 404);
         }
 
-        $student = Auth::guard('api')->user();
-
+        $student = Auth::guard('api')->user()->student;
         // تحقق إن الطالب مسجل في الكورس
         if (!$student->courses()->where('courses.id', $section->course_id)->exists()) {
             return response()->json(['message' => 'Not enrolled'], 403);
