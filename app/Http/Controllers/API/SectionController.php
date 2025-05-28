@@ -106,43 +106,5 @@ class SectionController extends Controller
         ]);
     }
 
-    public function scanQR(Request $request)
-    {
-        $data = json_decode($request->input('data'), true);
-
-        if (!$data || !isset($data['section_id'], $data['timestamp'], $data['signature'])) {
-            return response()->json(['message' => 'Invalid QR data'], 422);
-        }
-
-        $validSignature = hash_hmac('sha256', $data['section_id'] . $data['timestamp'], config('app.key'));
-        if ($validSignature !== $data['signature']) {
-            return response()->json(['message' => 'QR code tampered'], 403);
-        }
-
-        // if (now()->timestamp - $data['timestamp'] > 600) {
-        //     return response()->json(['message' => 'QR code expired'], 410);
-        // }
-
-        $section = Section::find($data['section_id']);
-        if (!$section) {
-            return response()->json(['message' => 'section not found'], 404);
-        }
-
-        $student = Auth::guard('api')->user()->student;
-        // تحقق إن الطالب مسجل في الكورس
-        if (!$student->courses()->where('courses.id', $section->course_id)->exists()) {
-            return response()->json(['message' => 'Not enrolled'], 403);
-        }
-
-        // تسجيل الحضور
-        StudentSection::updateOrCreate([
-            'student_id' => $student->id,
-            'section_id' => $section->id
-        ], [
-            'status' => 'true',
-            'updated_at' => now(),
-        ]);
-
-        return response()->json(['message' => 'Attendance recorded']);
-    }
+    
 }

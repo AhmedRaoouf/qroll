@@ -66,8 +66,7 @@ Route::middleware('api-auth')->group(function () {
     Route::prefix('student')->middleware(['check.role:student'])->group(function () {
         Route::get('courses/{course}/lectures-attendance', [LectureAbsenceController::class, 'getStudentLectureAbsences']);
         Route::get('courses/{course}/sections-attendance', [SectionAbsenceController::class, 'getStudentSectionAbsences']);
-        Route::post('lecture-attendance/scan', [LectureController::class, 'scanQR']);
-        Route::post('section-attendance/scan', [SectionController::class, 'scanQR']);
+        Route::post('attendance/scan', [StudentController::class, 'scanQR']);
     });
 
     // 📊 Absence Reports
