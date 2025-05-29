@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MassageResource;
 use App\Models\Inbox;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,7 +14,8 @@ class InboxController extends Controller
     // 👨‍🎓 Student: Get all received messages
     public function index()
     {
-        $messages = Inbox::where('receiver_id', Auth::id())
+        $student = Student::where('user_id',Auth::id())->first();
+        $messages = Inbox::where('receiver_id', $student->id)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -23,8 +25,9 @@ class InboxController extends Controller
     // 👨‍🎓 Student: View single message
     public function show($id)
     {
+        $student = Student::where('user_id',Auth::id())->first();
         $message = Inbox::where('id', $id)
-            ->where('receiver_id', Auth::id())
+            ->where('receiver_id', $student->id)
             ->first();
 
         if (!$message) {
