@@ -14,6 +14,7 @@ use App\Http\Controllers\API\{
     RoleController,
     SectionAbsenceController,
     DashboardController,
+    InboxController,
     LectureAbsenceController,
     UserImportController
 };
@@ -60,6 +61,7 @@ Route::middleware('api-auth')->group(function () {
         Route::apiResource('lectures', LectureController::class);
         Route::get('lectures/{lecture}/generate-qr', [LectureController::class, 'generateQR']);
         Route::get('sections/{section}/generate-qr', [SectionController::class, 'generateQR']);
+        Route::post('/inbox', [InboxController::class, 'store']);
     });
 
     // 👨‍🎓 Student Routes
@@ -67,6 +69,8 @@ Route::middleware('api-auth')->group(function () {
         Route::get('courses/{course}/lectures-attendance', [LectureAbsenceController::class, 'getStudentLectureAbsences']);
         Route::get('courses/{course}/sections-attendance', [SectionAbsenceController::class, 'getStudentSectionAbsences']);
         Route::post('attendance/scan', [StudentController::class, 'scanQR']);
+                    Route::get('inbox', [InboxController::class, 'index']);
+            Route::get('inbox/{id}', [InboxController::class, 'show']);
     });
 
     // 📊 Absence Reports
@@ -74,4 +78,17 @@ Route::middleware('api-auth')->group(function () {
     Route::get('courses/{course}/excessive-absence/sections', [SectionAbsenceController::class, 'getAbsencesByCourse']);
     Route::get('courses/{course}/lectures/{lecture}/attendance', [LectureAbsenceController::class, 'getAbsencesByLecture']);
     Route::get('courses/{course}/sections/{section}/attendance', [SectionAbsenceController::class, 'getAbsencesBySection']);
+
+    // 📨 Inbox Routes
+    Route::prefix('inbox')->group(function () {
+
+        // 👨‍🏫 Admin/Doctor can send messages
+        Route::middleware(['check.role:admin,doctor'])->group(function () {
+        });
+
+        // 👨‍🎓 Student can read his messages
+        Route::middleware(['check.role:student'])->group(function () {
+
+        });
+    });
 });
