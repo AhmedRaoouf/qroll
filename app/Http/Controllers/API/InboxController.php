@@ -43,7 +43,7 @@ class InboxController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'receiver_id' => 'required|exists:users,id',
+            'receiver_id' => 'required|exists:students,id',
             'message'     => 'required|string',
         ]);
 

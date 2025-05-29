@@ -17,14 +17,14 @@ class MassageResource extends JsonResource
         return [
             'id' => $this->id,
             'sender' => [
-                'id' => $this->sender->admin->id,
+                'id' => $this->sender->id,
                 'name' => $this->sender->name,
                 'email' => $this->sender->email,
             ],
             'receiver' => [
-                'id' => $this->receiver->studnet->id,
-                'name' => $this->receiver->name,
-                'email' => $this->receiver->email,
+                'id' => $this->receiver->id,
+                'name' => $this->receiver->user->name,
+                'email' => $this->receiver->user->email,
             ],
             'message' => $this->message,
             'created_at' => $this->created_at->toDateTimeString(),

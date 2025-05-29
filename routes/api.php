@@ -69,8 +69,8 @@ Route::middleware('api-auth')->group(function () {
         Route::get('courses/{course}/lectures-attendance', [LectureAbsenceController::class, 'getStudentLectureAbsences']);
         Route::get('courses/{course}/sections-attendance', [SectionAbsenceController::class, 'getStudentSectionAbsences']);
         Route::post('attendance/scan', [StudentController::class, 'scanQR']);
-                    Route::get('inbox', [InboxController::class, 'index']);
-            Route::get('inbox/{id}', [InboxController::class, 'show']);
+        Route::get('inbox', [InboxController::class, 'index']);
+        Route::get('inbox/{id}', [InboxController::class, 'show']);
     });
 
     // 📊 Absence Reports
@@ -83,12 +83,9 @@ Route::middleware('api-auth')->group(function () {
     Route::prefix('inbox')->group(function () {
 
         // 👨‍🏫 Admin/Doctor can send messages
-        Route::middleware(['check.role:admin,doctor'])->group(function () {
-        });
+        Route::middleware(['check.role:admin,doctor'])->group(function () {});
 
         // 👨‍🎓 Student can read his messages
-        Route::middleware(['check.role:student'])->group(function () {
-
-        });
+        Route::middleware(['check.role:student'])->group(function () {});
     });
 });
