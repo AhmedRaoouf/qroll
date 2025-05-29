@@ -14,7 +14,7 @@ class InboxController extends Controller
     // 👨‍🎓 Student: Get all received messages
     public function index()
     {
-        $student = Student::where('user_id',Auth::id())->first();
+        $student = Student::where('user_id',Auth::guard('api')->user()->id)->first();
         $messages = Inbox::where('receiver_id', $student->id)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -25,18 +25,13 @@ class InboxController extends Controller
     // 👨‍🎓 Student: View single message
     public function show($id)
     {
-        $student = Student::where('user_id',Auth::id())->first();
+        $student = Student::where('user_id',Auth::guard('api')->user()->id)->first();
         $message = Inbox::where('id', $id)
             ->where('receiver_id', $student->id)
             ->first();
 
         if (!$message) {
             return response()->json(['error' => 'Message not found'], 404);
-        }
-
-        // Mark as read
-        if (is_null($message->read_at)) {
-            $message->update(['read_at' => now()]);
         }
 
         return new MassageResource($message);
@@ -51,7 +46,7 @@ class InboxController extends Controller
         ]);
 
         $inbox = Inbox::create([
-            'sender_id'   => Auth::id(),
+            'sender_id'   => Auth::guard('api')->user()->id,
             'receiver_id' => $data['receiver_id'],
             'message'     => $data['message'],
         ]);
