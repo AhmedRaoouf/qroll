@@ -62,6 +62,7 @@ Route::middleware('api-auth')->group(function () {
         Route::get('lectures/{lecture}/generate-qr', [LectureController::class, 'generateQR']);
         Route::get('sections/{section}/generate-qr', [SectionController::class, 'generateQR']);
         Route::post('/inbox', [InboxController::class, 'store']);
+        Route::post('/take-action', [InboxController::class, 'takeAction']);
     });
 
     // 👨‍🎓 Student Routes
