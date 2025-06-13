@@ -46,7 +46,7 @@ class SectionAbsenceController extends Controller
 
             return [
                 'id' => $student->id,
-                'name' => $student->name,
+                'name' => $student->user->name,
                 'academic_id' => $student->academic_id,
                 'number_of_absence' => $absentCount,
                 'lecture_numbers' => $studentSections->pluck('section_id')->implode(','), // e.g., 5,7,9
