@@ -28,8 +28,8 @@ class SectionAbsenceController extends Controller
 
         $data = $students->map(function ($student) use ($sections) {
             $absentsections = StudentSection::where('student_id', $student->id)
-                ->whereIn('lecture_id', $sections)
-                ->pluck('lecture_id');
+                ->whereIn('section_id', $sections)
+                ->first();
 
             $totalsections = $sections->count();
             $absentCount = $absentsections->count();

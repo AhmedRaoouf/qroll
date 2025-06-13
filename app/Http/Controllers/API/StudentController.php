@@ -160,80 +160,75 @@ class StudentController extends Controller
     }
 
     public function scanQR(Request $request)
-{
-    $data = json_decode($request->input('data'), true);
+    {
+        $data = json_decode($request->input('data'), true);
 
-    // تحقق من صحة البيانات المرسلة
-    if (!$data || !isset($data['timestamp'], $data['signature'])) {
-        return response()->json(['message' => 'Invalid QR data'], 422);
-    }
-
-    // تحديد ما إذا كان QR يخص محاضرة أم سكشن
-    if (isset($data['lecture_id'])) {
-        $id = $data['lecture_id'];
-        $type = 'lecture';
-    } elseif (isset($data['section_id'])) {
-        $id = $data['section_id'];
-        $type = 'section';
-    } else {
-        return response()->json(['message' => 'Invalid QR type'], 422);
-    }
-
-    // تحقق من صحة التوقيع
-    $validSignature = hash_hmac('sha256', $id . $data['timestamp'], config('app.key'));
-    if ($validSignature !== $data['signature']) {
-        return response()->json(['message' => 'QR code tampered'], 403);
-    }
-
-    // تحقق من الوقت (اختياري - غير مفعل حالياً)
-    // if (now()->timestamp - $data['timestamp'] > 600) {
-    //     return response()->json(['message' => 'QR code expired'], 410);
-    // }
-
-    $student = Auth::guard('api')->user()->student;
-
-    if ($type === 'lecture') {
-        $lecture = Lecture::find($id);
-        if (!$lecture) {
-            return response()->json(['message' => 'Lecture not found'], 404);
+        // تحقق من صحة البيانات المرسلة
+        if (!$data || !isset($data['timestamp'], $data['signature'])) {
+            return response()->json(['message' => 'Invalid QR data'], 422);
         }
 
-        // تحقق من تسجيل الطالب في الكورس
-        if (!$student->courses()->where('courses.id', $lecture->course_id)->exists()) {
-            return response()->json(['message' => 'Not enrolled'], 403);
+        // تحديد ما إذا كان QR يخص محاضرة أم سكشن
+        if (isset($data['lecture_id'])) {
+            $id = $data['lecture_id'];
+            $type = 'lecture';
+        } elseif (isset($data['section_id'])) {
+            $id = $data['section_id'];
+            $type = 'section';
+        } else {
+            return response()->json(['message' => 'Invalid QR type'], 422);
         }
 
-        // تسجيل الحضور
-        StudentLecture::updateOrCreate([
-            'student_id' => $student->id,
-            'lecture_id' => $lecture->id
-        ], [
-            'status' => 'true',
-            'updated_at' => now(),
-        ]);
-    } else {
-        $section = Section::find($id);
-        if (!$section) {
-            return response()->json(['message' => 'Section not found'], 404);
+        // تحقق من صحة التوقيع
+        $validSignature = hash_hmac('sha256', $id . $data['timestamp'], config('app.key'));
+        if ($validSignature !== $data['signature']) {
+            return response()->json(['message' => 'QR code tampered'], 403);
         }
 
-        // تحقق من تسجيل الطالب في الكورس
-        if (!$student->courses()->where('courses.id', $section->course_id)->exists()) {
-            return response()->json(['message' => 'Not enrolled'], 403);
+        // تحقق من الوقت (اختياري - غير مفعل حالياً)
+        // if (now()->timestamp - $data['timestamp'] > 600) {
+        //     return response()->json(['message' => 'QR code expired'], 410);
+        // }
+
+        $student = Auth::guard('api')->user()->student;
+
+        if ($type === 'lecture') {
+            $lecture = Lecture::find($id);
+            if (!$lecture) {
+                return response()->json(['message' => 'Lecture not found'], 404);
+            }
+
+            // تحقق من تسجيل الطالب في الكورس
+            if (!$student->courses()->where('courses.id', $lecture->course_id)->exists()) {
+                return response()->json(['message' => 'Not enrolled'], 403);
+            }
+
+            StudentLecture::where('student_id', $student->id)
+                ->where('lecture_id', $lecture->id)
+                ->update([
+                    'status' => 'true',
+                    'updated_at' => now(),
+                ]);
+        } else {
+            $section = Section::find($id);
+            if (!$section) {
+                return response()->json(['message' => 'Section not found'], 404);
+            }
+
+            // تحقق من تسجيل الطالب في الكورس
+            if (!$student->courses()->where('courses.id', $section->course_id)->exists()) {
+                return response()->json(['message' => 'Not enrolled'], 403);
+            }
+
+            // تسجيل الحضور
+            StudentSection::where('student_id', $student->id)
+                ->where('section_id', $section->id)
+                ->update([
+                    'status' => 'true',
+                    'updated_at' => now(),
+                ]);
         }
 
-        // تسجيل الحضور
-        StudentSection::updateOrCreate([
-            'student_id' => $student->id,
-            'section_id' => $section->id
-        ], [
-            'status' => 'true',
-            'updated_at' => now(),
-        ]);
+        return response()->json(['message' => 'Attendance recorded']);
     }
-
-    return response()->json(['message' => 'Attendance recorded']);
-}
-
-
 }
