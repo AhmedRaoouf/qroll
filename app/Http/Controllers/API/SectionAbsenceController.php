@@ -107,7 +107,7 @@ class SectionAbsenceController extends Controller
 
             $status = $absence && $absence->status === true ? 'Present' : 'Absent';
             return [
-                'section_id'   => $section->id,
+                'section'   => $section,
                 'status'       => $status,
             ];
         });

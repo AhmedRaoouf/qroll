@@ -110,7 +110,7 @@ class LectureAbsenceController extends Controller
             $status = $absence && $absence->status === true ? 'Present' : 'Absent';
 
             return [
-                'lecture_id'   => $lecture->id,
+                'lecture'   => $lecture,
                 'status'       => $status,
             ];
         });
