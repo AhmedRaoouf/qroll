@@ -8,6 +8,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -47,7 +48,7 @@ class AuthController extends Controller
 
     public function ChangePassword(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::guard('api')->user();
         $user->password = Hash::make($request->password);
         $user->save();
         return response()->json(['message' => 'Password changed successfully']);
@@ -55,7 +56,7 @@ class AuthController extends Controller
 
     public function resetPassword(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::guard('api')->user();
         if (!$user || !Hash::check($request->old_password, $user->password)) {
             return response()->json(['message' => 'Old password not correct!'], 401);
         }

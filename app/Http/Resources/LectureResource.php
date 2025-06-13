@@ -18,6 +18,8 @@ class LectureResource extends JsonResource
             'id'         => $this->id,
             'name'       => $this->name,
             'course'     => new CourseResource($this->course),
+            'created_at' => $this->created_at->format('d-m-Y'),
+
         ];
     }
 }
