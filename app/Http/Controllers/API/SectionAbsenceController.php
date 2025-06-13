@@ -20,21 +20,28 @@ class SectionAbsenceController extends Controller
         if (! $course) {
             return response()->json(['error' => 'Course not found'], 404);
         }
+
+        // Get students registered in this course through sections
         $students = Student::whereHas('sections.course', function ($q) use ($course) {
             $q->where('id', $course->id);
         })->get();
 
-        $sections = Section::where('course_id', $course->id)->pluck('id');
+        // Get all section IDs related to the course
+        $sectionIds = Section::where('course_id', $course->id)->pluck('id');
 
-        $data = $students->map(function ($student) use ($sections) {
-            $absentsections = StudentSection::where('student_id', $student->id)
-                ->whereIn('section_id', $sections)
-                ->first();
+        // Prepare data per student
+        $data = $students->map(function ($student) use ($sectionIds) {
+            // Get all section records for this student in this course
+            $studentSections = StudentSection::where('student_id', $student->id)
+                ->whereIn('section_id', $sectionIds)
+                ->get();
 
-            $totalsections = $sections->count();
-            $absentCount = $absentsections->count();
-            $absencePercentage = $totalsections > 0
-                ? round(($absentCount / $totalsections) * 100)
+            // You can filter by status here if needed, e.g. where('status', 'absent')
+            $absentCount = $studentSections->count();
+            $totalSections = $sectionIds->count();
+
+            $absencePercentage = $totalSections > 0
+                ? round(($absentCount / $totalSections) * 100)
                 : 0;
 
             return [
@@ -42,13 +49,14 @@ class SectionAbsenceController extends Controller
                 'name' => $student->name,
                 'academic_id' => $student->academic_id,
                 'number_of_absence' => $absentCount,
-                'lecture_numbers' => $absentsections->implode(','),
+                'lecture_numbers' => $studentSections->pluck('section_id')->implode(','), // e.g., 5,7,9
                 'absence_percentage' => "{$absencePercentage}%",
             ];
         });
 
         return response()->json($data);
     }
+
 
 
     public function getAbsencesBySection(string $courseId, string $sectionId)
