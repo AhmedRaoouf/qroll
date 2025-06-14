@@ -87,7 +87,7 @@ class SectionAbsenceController extends Controller
 
             return [
                 'id' => $student->id,
-                'name' => $student->name,
+                'name' => $student->user->name,
                 'academic_id' => $student->academic_id,
                 'status' => $status,
             ];
