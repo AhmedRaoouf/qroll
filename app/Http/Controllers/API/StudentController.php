@@ -185,46 +185,27 @@ class StudentController extends Controller
         $student = Auth::guard('api')->user()->student;
 
         if ($type === 'lecture') {
-            $lecture = Lecture::find($id);
-            if (!$lecture) {
-                return response()->json(['message' => 'Lecture not found'], 404);
-            }
-
-            if (!$student->courses()->where('courses.id', $lecture->course_id)->exists()) {
-                return response()->json(['message' => 'Not enrolled'], 403);
-            }
-
-            StudentLecture::where('student_id', $student->id)
-                ->where('lecture_id', $lecture->id)
-                ->update([
-                    'status' => 'true',
-                    'updated_at' => now(),
-                ]);
-
-            $attendance = StudentLecture::where('student_id', $student->id)
-                ->where('lecture_id', $lecture->id)
-                ->first();
+            $model = Lecture::find($id);
+            $relationColumn = 'lecture_id';
+            $attendanceModel = \App\Models\StudentLecture::class;
         } else {
-            $section = Section::find($id);
-            if (!$section) {
-                return response()->json(['message' => 'Section not found'], 404);
-            }
-
-            if (!$student->courses()->where('courses.id', $section->course_id)->exists()) {
-                return response()->json(['message' => 'Not enrolled'], 403);
-            }
-
-            StudentSection::where('student_id', $student->id)
-                ->where('section_id', $section->id)
-                ->update([
-                    'status' => 'true',
-                    'updated_at' => now(),
-                ]);
-
-            $attendance = StudentSection::where('student_id', $student->id)
-                ->where('section_id', $section->id)
-                ->first();
+            $model = Section::find($id);
+            $relationColumn = 'section_id';
+            $attendanceModel = \App\Models\StudentSection::class;
         }
+
+        if (!$model) {
+            return response()->json(['message' => ucfirst($type) . ' not found'], 404);
+        }
+
+        if (!$student->courses()->where('courses.id', $model->course_id)->exists()) {
+            return response()->json(['message' => 'Not enrolled'], 403);
+        }
+
+        $attendance = $this->createOrUpdateAttendance($attendanceModel, [
+            'student_id' => $student->id,
+            $relationColumn => $id,
+        ]);
 
         return response()->json([
             'message' => 'Attendance recorded',
@@ -233,7 +214,18 @@ class StudentController extends Controller
                 'name' => $student->user->name ?? '',
                 'email' => $student->user->email ?? '',
             ],
-            'attendance_status' => $attendance?->status,
+            'attendance_status' => $attendance->status,
         ]);
+    }
+
+    private function createOrUpdateAttendance($model, array $conditions)
+    {
+        return $model::updateOrCreate(
+            $conditions,
+            [
+                'status' => 'true',
+                'updated_at' => now(),
+            ]
+        );
     }
 }
