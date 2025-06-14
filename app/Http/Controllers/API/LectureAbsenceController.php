@@ -79,6 +79,7 @@ class LectureAbsenceController extends Controller
                 'id' => $student->id,
                 'name' => $student->user->name,
                 'academic_id' => $student->academic_id,
+                'date' => $lecture->created_at->format('d-m-Y'),
                 'status' => $status,
             ];
         });

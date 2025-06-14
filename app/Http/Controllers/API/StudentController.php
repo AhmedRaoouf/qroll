@@ -233,7 +233,7 @@ class StudentController extends Controller
                 'name' => $student->user->name ?? '',
                 'email' => $student->user->email ?? '',
             ],
-            'attendance_status' => $attendance->status,
+            'attendance_status' => $attendance?->status,
         ]);
     }
 }
